@@ -7,16 +7,9 @@ Created on Thu Feb  7 14:52:35 2019
 """
 #I don't need to open the input file, you can use the function directly
 #f_inp = '/home/cnavarrete/Desktop/Maciek_Task/test.sm.fa'
+import argparse
 from Bio import SeqIO
-from sys import argv
-
-if len(argv) == 3:
-    f_in = argv[1] 
-    f_out = argv[2] 
-else:
-    print('Usage: script_sm.py input_FASTA output_BED')
-#f_in = '/home/cnavarrete/Desktop/Maciek_Task/test.sm.fa'
-#f_out = '/home/cnavarrete/Desktop/Maciek_Task/file1_sm_output.bed'
+from sys import stdin, stdout
 
 def getLowerCase(f_in, f_out):
     """
@@ -25,7 +18,6 @@ def getLowerCase(f_in, f_out):
     f_in: FASTA file
     f_out: BED file
     """
-    fo = open(f_out, "w")
     for seq_record in SeqIO.parse(f_in, "fasta"):
         chr_id = seq_record.id
         chr = str(seq_record.seq)
@@ -50,8 +42,8 @@ def getLowerCase(f_in, f_out):
             end_ind.append(i)
     
         for start, end in zip(start_ind, end_ind):
-            print('%s\t%i\t%i' % (chr_id, start, end), file = fo)
-    fo.close()
+            print('%s\t%i\t%i' % (chr_id, start, end), file = f_out)
+    f_out.close()
 
 # TODO 
 # def getUppercase(in, out)
@@ -70,3 +62,10 @@ def isSameCase(fasta, case="upper"):
      # this is one of the ways we could print corresponding elements from two lists
     #for i in range(1, len(start_ind)):
     #    strat_ind[i], end_ind[i]
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Locate lower case latters in fasta file")
+    parser.add_argument('infile', type=argparse.FileType('r'), help="input fasta file")
+    args = parser.parse_args()
+
+    getLowerCase(args.infile, stdout)
