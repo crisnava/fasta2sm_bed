@@ -1,23 +1,23 @@
-#!/usr/bin/env python3.5
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Feb  7 14:52:35 2019
+#!/usr/bin/env python3
 
-@author: cnavarrete
-"""
-#I don't need to open the input file, you can use the function directly
-#f_inp = '/home/cnavarrete/Desktop/Maciek_Task/test.sm.fa'
 import argparse
+import gzip
 from Bio import SeqIO
 from sys import stdin, stdout
 
-def getLowerCase(f_in, f_out):
+def getLowerCase(fa, bed):
     """
     Cool function to detect lowercase characters in a FASTA file
     
-    f_in: FASTA file
-    f_out: BED file
+    fa: FASTA file
+    bed: BED file
     """
+    
+    f_in = fa
+    if fa.endswith('.gz'):
+        with gzip.open(fa, 'rb') as f_unzip:
+            f_in = f_unzip.read()
+    
     for seq_record in SeqIO.parse(f_in, "fasta"):
         chr_id = seq_record.id
         chr = str(seq_record.seq)
@@ -42,8 +42,8 @@ def getLowerCase(f_in, f_out):
             end_ind.append(i)
     
         for start, end in zip(start_ind, end_ind):
-            print('%s\t%i\t%i' % (chr_id, start, end), file = f_out)
-    f_out.close()
+            print('%s\t%i\t%i' % (chr_id, start, end), file = bed)
+    bed.close()
 
 # TODO 
 # def getUppercase(in, out)
@@ -65,7 +65,9 @@ def isSameCase(fasta, case="upper"):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Locate lower case latters in fasta file")
-    parser.add_argument('infile', type=argparse.FileType('r'), help="input fasta file")
+    parser.add_argument('-f', '--file',
+                        type=argparse.FileType('r'), 
+                        help="input fasta file")
     args = parser.parse_args()
 
-    getLowerCase(args.infile, stdout)
+    getLowerCase(args.file, stdout)
