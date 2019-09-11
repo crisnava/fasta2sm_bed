@@ -65,21 +65,30 @@ def getBothCases(fa, bed_low, bed_up):
                 start_ind_low.append(i)
             
             elif chr[i-1].isupper() and chr[i].islower():
-                start_ind.append(i) 
+                start_ind_low.append(i) 
         
         for i in range (0, len(chr)):
             if chr[0].isupper() and i==0:
-                continue
+                start_ind_up.append(i)
         
             elif chr[i-1].islower() and chr[i].isupper():
-                end_ind.append(i-1) 
+                start_ind_up.append(i)
+                end_ind_low.append(i-1) 
     
         if chr[i].islower():
-            end_ind.append(i)
+            end_ind_low.append(i)
+        
+        if chr[i].isupper():
+            end_ind_up.append(i)
     
-        for start, end in zip(start_ind, end_ind):
+        for start, end in zip(start_ind_low, end_ind_low):
             print('%s\t%i\t%i' % (chr_id, start, end), file = bed_low)
-    bed.close()
+        
+        for start, end in zip(start_ind_up, end_ind_up):
+            print('%s\t%i\t%i' % (chr_id, start, end), file = bed_up)
+            
+    bed_low.close()
+    bed_up.close()
    '''
         for i in range (0, len(chr)):
             if chr[0].isupper() and i==0:
