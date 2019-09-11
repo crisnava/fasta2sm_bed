@@ -5,7 +5,7 @@ import gzip
 from Bio import SeqIO
 from sys import stdin, stdout
 
-def getLowerCase(fa, bed):
+def getLowerCase(fa, bed_low):
     """
     Cool function to detect lowercase characters in a FASTA file
     
@@ -18,7 +18,7 @@ def getLowerCase(fa, bed):
         with gzip.open(fa, 'rb') as f_unzip:
             f_in = f_unzip.read()
     
-    for seq_record in SeqIO.parse(f_in, "fasta"):
+    for seq_record in SeqIO.parse(fa, "fasta"):
         chr_id = seq_record.id
         chr = str(seq_record.seq)
         start_ind = []
@@ -42,11 +42,40 @@ def getLowerCase(fa, bed):
             end_ind.append(i)
     
         for start, end in zip(start_ind, end_ind):
-            print('%s\t%i\t%i' % (chr_id, start, end), file = bed)
+            print('%s\t%i\t%i' % (chr_id, start, end), file = bed_low)
     bed.close()
 
 # TODO 
 # def getUppercase(in, out)
+
+def getUpperCase(fa, bed_up):
+    
+    for seq_record in SeqIO.parse(fa, "fasta"):
+        chr_id = seq_record.id
+        chr = str(seq_record.seq)
+        start_ind = []
+        end_ind = []
+   
+        for i in range (0, len(chr)):
+            if chr[0].isupper() and i==0:
+                start_ind.append(i)
+            
+            elif chr[i-1].islower() and chr[i].isupper():
+                start_ind.append(i) 
+        
+        for i in range (0, len(chr)):
+            if chr[0].islower() and i==0:
+                continue
+        
+            elif chr[i-1].isupper() and chr[i].islower():
+                end_ind.append(i-1) 
+    
+        if chr[i].isupper():
+            end_ind.append(i)
+    
+        for start, end in zip(start_ind, end_ind):
+            print('%s\t%i\t%i' % (chr_id, start, end), file = bed_up)
+    bed_up.close()
 
 def isSameCase(fasta, case="upper"):
     """
@@ -55,6 +84,11 @@ def isSameCase(fasta, case="upper"):
     fasta: FASTA file
     case: either "upper" or "lower"
     """
+    for seq_record in SeqIO.parse(f_in, "fasta"):
+        chr_id = seq_record.id
+        chr = str(seq_record.seq)
+        
+    
     return True # or False if not all the letters have the same case
     
 #getLowercase(f_in, f_out)
@@ -64,7 +98,7 @@ def isSameCase(fasta, case="upper"):
     #    strat_ind[i], end_ind[i]
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Locate lower case latters in fasta file")
+    parser = argparse.ArgumentParser(description="Locate lower case letters in fasta file")
     parser.add_argument('-f', '--file',
                         type=argparse.FileType('r'), 
                         help="input fasta file")
