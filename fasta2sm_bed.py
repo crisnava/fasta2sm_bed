@@ -48,14 +48,39 @@ def getLowerCase(fa, bed_low):
 # TODO 
 # def getUppercase(in, out)
 
-def getUpperCase(fa, bed_up):
-    
+def getBothCases(fa, bed_low, bed_up):
+    '''
+    Merge function to get 2 bed files: 1 with uppercase and 1 with lowercase 
+    '''
     for seq_record in SeqIO.parse(fa, "fasta"):
         chr_id = seq_record.id
         chr = str(seq_record.seq)
-        start_ind = []
-        end_ind = []
-   
+        start_ind_low = []
+        start_ind_up = []
+        end_ind_low = []
+        end_ind_up = []
+        
+        for i in range (0, len(chr)):
+            if chr[0].islower() and i==0:
+                start_ind_low.append(i)
+            
+            elif chr[i-1].isupper() and chr[i].islower():
+                start_ind.append(i) 
+        
+        for i in range (0, len(chr)):
+            if chr[0].isupper() and i==0:
+                continue
+        
+            elif chr[i-1].islower() and chr[i].isupper():
+                end_ind.append(i-1) 
+    
+        if chr[i].islower():
+            end_ind.append(i)
+    
+        for start, end in zip(start_ind, end_ind):
+            print('%s\t%i\t%i' % (chr_id, start, end), file = bed_low)
+    bed.close()
+   '''
         for i in range (0, len(chr)):
             if chr[0].isupper() and i==0:
                 start_ind.append(i)
@@ -76,7 +101,7 @@ def getUpperCase(fa, bed_up):
         for start, end in zip(start_ind, end_ind):
             print('%s\t%i\t%i' % (chr_id, start, end), file = bed_up)
     bed_up.close()
-
+'''
 def isSameCase(fasta, case="upper"):
     """
     This function checks if the fasta file contains just upper or lower case letters
